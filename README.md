@@ -41,10 +41,15 @@ pnpm install
 Create a `.env` or `.env.local` file in the root directory to configure the backend API endpoint:
 
 ```env
-VITE_API_BASE_URL=http://localhost:8080
+# Leave empty for local development (uses Vite dev server proxy to avoid CORS issues)
+VITE_API_BASE_URL=
 ```
 
-*Note: Ensure your OFBiz server is running and the REST API is accessible at this address.*
+#### Development vs. Production API Routing
+- **Development**: Leave `VITE_API_BASE_URL` empty. The app makes requests to the same origin (e.g. `http://localhost:5173/rest/...`), which the Vite dev server proxy (defined in `vite.config.js`) forwards to the OFBiz backend (`http://localhost:8080`), bypassing browser CORS policies.
+- **Production**:
+  - **Same-Domain (Recommended)**: Serve built static files from the same domain as the OFBiz backend (relative URLs naturally route to the correct server).
+  - **Cross-Domain**: Set `VITE_API_BASE_URL` to the production backend API URL (e.g. `https://api.yourdomain.com`). In this scenario, make sure to add your frontend domain to the `cors.origins.allowed` property in the backend `security.properties`.
 
 ### 3. Development Server
 
