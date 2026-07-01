@@ -38,21 +38,7 @@ export default function Login() {
     }
   };
 
-  const handleMockLogin = () => {
-    // A fallback helper to allow testing the UI without a running backend
-    console.warn('Using mock authentication bypass for development');
-    
-    // Create a mock JWT-like token (header.payload.signature)
-    const header = btoa(JSON.stringify({ alg: 'HS512', typ: 'JWT' }));
-    const payload = btoa(JSON.stringify({ 
-      userLoginId: username || 'demo_operator', 
-      exp: Math.floor(Date.now() / 1000) + 3600 
-    }));
-    const mockToken = `${header}.${payload}.signature`;
-    
-    saveToken(mockToken);
-    navigate(from, { replace: true });
-  };
+
 
   const currentError = localError || apiError;
 
@@ -161,24 +147,7 @@ export default function Login() {
           </button>
         </form>
 
-        <div style={{
-          width: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: '10px',
-          borderTop: '1px solid var(--border-color)',
-          paddingTop: '20px'
-        }}>
-          <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Connection issues? Try development bypass:</span>
-          <button
-            onClick={handleMockLogin}
-            className="btn btn-secondary"
-            style={{ fontSize: '0.8rem', padding: '8px 16px' }}
-          >
-            Bypass with Demo Account
-          </button>
-        </div>
+
       </div>
     </div>
   );

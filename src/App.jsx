@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { LogOut, Box, Shield, Warehouse } from 'lucide-react';
@@ -150,12 +151,21 @@ export default function App() {
   const [user, setUser] = useState(null);
   const [facilityId, setFacilityId] = useState(() => localStorage.getItem('picking_facility_id'));
 
+  const handleLogout = () => {
+    localStorage.removeItem('picking_jwt');
+    localStorage.removeItem('picking_facility_id');
+    setToken(null);
+    setUser(null);
+    setFacilityId(null);
+  };
+
   useEffect(() => {
     if (token) {
       try {
         const decoded = jwtDecode(token);
         // Expiration check
         if (decoded.exp && decoded.exp * 1000 < Date.now()) {
+          // eslint-disable-next-line react-hooks/set-state-in-effect
           handleLogout();
         } else {
           setUser({
@@ -163,7 +173,7 @@ export default function App() {
             ...decoded
           });
         }
-      } catch (err) {
+      } catch {
         handleLogout();
       }
     } else {
@@ -174,14 +184,6 @@ export default function App() {
   const handleLogin = (newToken) => {
     localStorage.setItem('picking_jwt', newToken);
     setToken(newToken);
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem('picking_jwt');
-    localStorage.removeItem('picking_facility_id');
-    setToken(null);
-    setUser(null);
-    setFacilityId(null);
   };
 
   const handleSelectFacility = (id) => {
