@@ -1,7 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
-import { LogOut, Box, Shield, Warehouse } from 'lucide-react';
+import { LogOut, Box, Shield, Warehouse, Menu, X, ClipboardList } from 'lucide-react';
 import { jwtDecode } from 'jwt-decode';
 
 // Import Screens (to be implemented next)
@@ -43,46 +43,105 @@ function Layout({ children }) {
   const { user, logout } = useContext(AuthContext);
   const { facilityId } = useContext(FacilityContext);
   const navigate = useNavigate();
+  const location = useLocation();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
 
+  const isActive = (path) => location.pathname === path;
+
+  // Close mobile sidebar on route switch
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setIsSidebarOpen(false);
+  }, [location]);
+
   return (
-    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+    <div className="app-root animate-fade-in">
       <header className="app-header">
-        <div className="logo-container" style={{ cursor: 'pointer' }} onClick={() => navigate('/')}>
-          <Box className="logo-icon" />
-          <span className="logo-text">PICKING.PWA</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          {user && (
+            <button 
+              className="hamburger-btn" 
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+              aria-label="Toggle Menu"
+            >
+              {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
+          )}
+          <div className="logo-container" style={{ cursor: 'pointer' }} onClick={() => navigate('/')}>
+            <Box className="logo-icon" />
+            <span className="logo-text">PICKING.PWA</span>
+          </div>
         </div>
         
-        {user && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-            {facilityId && (
-              <span className="facility-badge" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <Warehouse size={12} />
-                {facilityId}
-              </span>
-            )}
-            <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <Shield size={12} style={{ color: 'var(--accent)' }} />
-              {user.username}
-            </span>
-            <button 
-              onClick={handleLogout} 
-              className="btn btn-secondary" 
-              style={{ padding: '6px 10px', borderRadius: '6px', width: 'auto', display: 'flex', alignItems: 'center', gap: '4px' }}
-              title="Logout"
-            >
-              <LogOut size={14} />
-            </button>
-          </div>
+        {user && facilityId && (
+          <span className="facility-badge" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <Warehouse size={12} />
+            {facilityId}
+          </span>
         )}
       </header>
-      <main className="main-container">
-        {children}
-      </main>
+
+      <div className="app-body">
+        {user && (
+          <>
+            <aside className={`app-sidebar ${isSidebarOpen ? 'open' : ''}`}>
+              <div className="sidebar-header">
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 'bold' }}>Active Zone</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: facilityId ? 'var(--accent)' : 'var(--text-muted)' }}>
+                  <Warehouse size={18} />
+                  <span style={{ fontWeight: '600', fontSize: '0.95rem' }}>{facilityId || 'No Facility Selected'}</span>
+                </div>
+              </div>
+
+              <nav className="sidebar-nav">
+                <button
+                  onClick={() => navigate('/queue')}
+                  disabled={!facilityId}
+                  className={`sidebar-nav-item ${isActive('/queue') ? 'active' : ''} ${!facilityId ? 'disabled' : ''}`}
+                >
+                  <ClipboardList size={18} />
+                  Order Queue
+                </button>
+
+                <button
+                  onClick={() => navigate('/facility')}
+                  className={`sidebar-nav-item ${isActive('/facility') ? 'active' : ''}`}
+                >
+                  <Warehouse size={18} />
+                  Change Facility
+                </button>
+              </nav>
+
+              <div className="sidebar-footer">
+                <div className="sidebar-user">
+                  <Shield size={16} style={{ color: 'var(--accent)' }} />
+                  <span style={{ fontWeight: '600' }}>{user.username}</span>
+                </div>
+                <button 
+                  onClick={handleLogout} 
+                  className="btn btn-secondary" 
+                  style={{ padding: '8px 12px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'center' }}
+                >
+                  <LogOut size={14} />
+                  Sign Out
+                </button>
+              </div>
+            </aside>
+            {isSidebarOpen && (
+              <div className="sidebar-overlay" onClick={() => setIsSidebarOpen(false)} />
+            )}
+          </>
+        )}
+
+        <main className="main-container">
+          {children}
+        </main>
+      </div>
     </div>
   );
 }
