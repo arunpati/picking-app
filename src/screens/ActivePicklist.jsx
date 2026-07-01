@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Play, Check, AlertCircle, MapPin, ChevronLeft, Award, Package, ShoppingBag, ArrowRight } from 'lucide-react';
 import { usePickingApi } from '../hooks/usePickingApi';
@@ -14,26 +14,10 @@ export default function ActivePicklist() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
 
+  const getItemId = (item) => `${item.picklistBinId}-${item.orderId}-${item.orderItemSeqId}`;
+
   useEffect(() => {
     const fetchPicklist = async () => {
-      // Check if this is a mock picklist first
-      const mockData = localStorage.getItem(`mock_picklist_${picklistId}`);
-      if (mockData) {
-        try {
-          const parsed = JSON.parse(mockData);
-          setItems(parsed.items || []);
-          
-          // Check for pre-existing picked items in mock storage
-          const savedPicks = localStorage.getItem(`mock_picks_${picklistId}`);
-          if (savedPicks) {
-            setPickedQuantities(JSON.parse(savedPicks));
-          }
-          return;
-        } catch (err) {
-          console.error('Failed to parse mock picklist', err);
-        }
-      }
-
       // Real API fetch
       try {
         const response = await getPicklistDetails(picklistId);
@@ -61,7 +45,7 @@ export default function ActivePicklist() {
     if (picklistId) {
       fetchPicklist();
     }
-  }, [picklistId]);
+  }, [picklistId, getPicklistDetails]);
 
   // Sorting items by Aisle -> Section -> Level (walking path optimization)
   const sortedItems = [...items].sort((a, b) => {
@@ -78,28 +62,10 @@ export default function ActivePicklist() {
     return lvlA.localeCompare(lvlB);
   });
 
-  const getItemId = (item) => `${item.picklistBinId}-${item.orderId}-${item.orderItemSeqId}`;
-
   const handleConfirmPick = async (item) => {
     const itemId = getItemId(item);
     setActionLoading((prev) => ({ ...prev, [itemId]: true }));
     setErrorMessage(null);
-
-    // Check if mock picklist
-    const isMock = localStorage.getItem(`mock_picklist_${picklistId}`) !== null;
-
-    if (isMock) {
-      setTimeout(() => {
-        const newPicks = {
-          ...pickedQuantities,
-          [itemId]: item.quantity // Mocking pick full quantity
-        };
-        setPickedQuantities(newPicks);
-        localStorage.setItem(`mock_picks_${picklistId}`, JSON.stringify(newPicks));
-        setActionLoading((prev) => ({ ...prev, [itemId]: false }));
-      }, 500);
-      return;
-    }
 
     try {
       await recordPick(item.picklistBinId, item.orderItemSeqId, item.orderId, item.shipGroupSeqId, item.inventoryItemId, item.quantity);
@@ -191,7 +157,7 @@ export default function ActivePicklist() {
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-          {sortedItems.map((item, index) => {
+          {sortedItems.map((item) => {
             const itemId = getItemId(item);
             const isPicked = isItemPicked(item);
             const isLoading = actionLoading[itemId];

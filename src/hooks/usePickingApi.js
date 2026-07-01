@@ -35,7 +35,7 @@ export function usePickingApi() {
         try {
           const data = await response.json();
           errMsg = data.message || data.error || errMsg;
-        } catch (_) {
+        } catch {
           // ignore parsing error if response isn't JSON
         }
         throw new Error(errMsg);
@@ -46,7 +46,7 @@ export function usePickingApi() {
       if (contentType && contentType.includes('application/json')) {
         const json = await response.json();
         // If it's a standard JAX-RS success wrapper, unwrap it to return the inner data directly
-        if (json && (json.status === 'OK' || json.statusDescription === 'OK' || json.statusCode === 200) && json.hasOwnProperty('data')) {
+        if (json && (json.status === 'OK' || json.statusDescription === 'OK' || json.statusCode === 200) && 'data' in json) {
           return json.data;
         }
         return json;

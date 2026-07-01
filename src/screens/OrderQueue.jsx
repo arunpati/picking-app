@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ClipboardList, PlusCircle, AlertCircle, RefreshCw, Layers, CheckCircle2 } from 'lucide-react';
 import { FacilityContext } from '../App';
@@ -14,7 +14,7 @@ export default function OrderQueue() {
   
   const navigate = useNavigate();
 
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
     try {
       const response = await getOrdersToPick(facilityId);
       if (response && response.orderList) {
@@ -25,13 +25,14 @@ export default function OrderQueue() {
     } catch (err) {
       console.error('API Error: falling back or showing error', err);
     }
-  };
+  }, [facilityId, getOrdersToPick]);
 
   useEffect(() => {
     if (facilityId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       fetchOrders();
     }
-  }, [facilityId]);
+  }, [facilityId, fetchOrders]);
 
   const handleToggleSelect = (orderId) => {
     setSelectedIds((prev) =>
@@ -66,65 +67,7 @@ export default function OrderQueue() {
     }
   };
 
-  // Generate mock orders for dev validation
-  const handleLoadMockOrders = () => {
-    const mockOrders = [
-      { orderId: 'WS-10042', orderDate: new Date(Date.now() - 3600000 * 2).toISOString(), statusId: 'ORDER_APPROVED', grandTotal: 124.50 },
-      { orderId: 'WS-10043', orderDate: new Date(Date.now() - 3600000 * 4).toISOString(), statusId: 'ORDER_APPROVED', grandTotal: 89.99 },
-      { orderId: 'WS-10044', orderDate: new Date(Date.now() - 3600000 * 6).toISOString(), statusId: 'ORDER_APPROVED', grandTotal: 345.00 },
-      { orderId: 'WS-10045', orderDate: new Date(Date.now() - 3600000 * 12).toISOString(), statusId: 'ORDER_APPROVED', grandTotal: 15.20 },
-      { orderId: 'WS-10046', orderDate: new Date(Date.now() - 3600000 * 24).toISOString(), statusId: 'ORDER_APPROVED', grandTotal: 250.75 },
-    ];
-    setOrders(mockOrders);
-  };
 
-  const handleMockCreatePicklist = () => {
-    if (selectedIds.length === 0) return;
-    setCreationLoading(true);
-    
-    // Save selected mock orders temporarily in localStorage to populate active picklist
-    const mockPicklistItems = [];
-    let binIdCounter = 1000;
-    
-    selectedIds.forEach((orderId) => {
-      const binId = `PLB-${binIdCounter++}`;
-      // Add items based on order
-      if (orderId === 'WS-10042') {
-        mockPicklistItems.push(
-          { picklistBinId: binId, orderId, orderItemSeqId: '00001', productId: 'PROD_MOCK_A', productName: 'Stainless Steel Utility Tool', quantity: 2, aisle: 'A', section: '3', level: '1' },
-          { picklistBinId: binId, orderId, orderItemSeqId: '00002', productId: 'PROD_MOCK_B', productName: 'Hardened Lock Collar', quantity: 1, aisle: 'A', section: '5', level: '2' }
-        );
-      } else if (orderId === 'WS-10043') {
-        mockPicklistItems.push(
-          { picklistBinId: binId, orderId, orderItemSeqId: '00001', productId: 'PROD_MOCK_C', productName: 'Heavy Duty Caster Wheel', quantity: 4, aisle: 'B', section: '1', level: '3' }
-        );
-      } else if (orderId === 'WS-10044') {
-        mockPicklistItems.push(
-          { picklistBinId: binId, orderId, orderItemSeqId: '00001', productId: 'PROD_MOCK_D', productName: 'Industrial Safety Mask', quantity: 10, aisle: 'A', section: '1', level: '2' },
-          { picklistBinId: binId, orderId, orderItemSeqId: '00002', productId: 'PROD_MOCK_B', productName: 'Hardened Lock Collar', quantity: 3, aisle: 'A', section: '5', level: '2' },
-          { picklistBinId: binId, orderId, orderItemSeqId: '00003', productId: 'PROD_MOCK_E', productName: 'LED Worklight Bar', quantity: 1, aisle: 'C', section: '2', level: '4' }
-        );
-      } else {
-        // Fallback item for other orders
-        mockPicklistItems.push(
-          { picklistBinId: binId, orderId, orderItemSeqId: '00001', productId: 'PROD_GENERIC', productName: 'Generic Warehouse Supply', quantity: 1, aisle: 'D', section: '1', level: '1' }
-        );
-      }
-    });
-
-    const mockPicklistId = `PL-${Math.floor(100000 + Math.random() * 900000)}`;
-    localStorage.setItem(`mock_picklist_${mockPicklistId}`, JSON.stringify({
-      picklistId: mockPicklistId,
-      items: mockPicklistItems
-    }));
-
-    setTimeout(() => {
-      setCreationLoading(false);
-      navigate(`/picklist/${mockPicklistId}`);
-    }, 800);
-  };
-
-  const showMockCreation = error || orders.length === 0;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -195,13 +138,6 @@ export default function OrderQueue() {
               All orders have been picklisted, or no inventory matches are available.
             </p>
           </div>
-          <button
-            onClick={handleLoadMockOrders}
-            className="btn btn-secondary"
-            style={{ width: 'auto', fontSize: '0.85rem' }}
-          >
-            Load Demo Picking Orders
-          </button>
         </div>
       ) : (
         /* Order Cards List */
@@ -335,7 +271,7 @@ export default function OrderQueue() {
           </div>
           
           <button
-            onClick={showMockCreation ? handleMockCreatePicklist : handleCreatePicklist}
+            onClick={handleCreatePicklist}
             className="btn btn-primary"
             style={{ flex: 1, padding: '12px' }}
             disabled={creationLoading}
