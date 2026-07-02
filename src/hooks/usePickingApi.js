@@ -1,10 +1,12 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useContext } from 'react';
+import { AuthContext } from '../App';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
 export function usePickingApi() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const { logout } = useContext(AuthContext);
 
   const getHeaders = useCallback(() => {
     const token = localStorage.getItem('picking_jwt');
@@ -29,6 +31,11 @@ export function usePickingApi() {
           ...options.headers,
         },
       });
+
+      if (response.status === 401) {
+        logout();
+        throw new Error('Session expired. Please log in again.');
+      }
 
       if (!response.ok) {
         let errMsg = `Request failed with status ${response.status}`;
@@ -77,9 +84,6 @@ export function usePickingApi() {
     throw new Error('Invalid token response from server');
   }, [request]);
 
-  const logout = useCallback(() => {
-    localStorage.removeItem('picking_jwt');
-  }, []);
 
   const getOrdersToPick = useCallback(async (facilityId) => {
     const inParams = JSON.stringify({ facilityId });

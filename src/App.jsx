@@ -241,12 +241,16 @@ export default function App() {
   };
 
   useEffect(() => {
-    if (token) {
+    if (!token) {
+      setUser(null);
+      return;
+    }
+
+    const checkTokenExpiration = () => {
       try {
         const decoded = jwtDecode(token);
         // Expiration check
         if (decoded.exp && decoded.exp * 1000 < Date.now()) {
-          // eslint-disable-next-line react-hooks/set-state-in-effect
           handleLogout();
         } else {
           setUser({
@@ -257,9 +261,13 @@ export default function App() {
       } catch {
         handleLogout();
       }
-    } else {
-      setUser(null);
-    }
+    };
+
+    checkTokenExpiration();
+
+    // Check expiration every 10 seconds
+    const interval = setInterval(checkTokenExpiration, 10000);
+    return () => clearInterval(interval);
   }, [token]);
 
   const handleLogin = (newToken) => {
