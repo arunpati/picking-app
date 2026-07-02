@@ -7,7 +7,7 @@ export default function ActivePicklist() {
   const { picklistId } = useParams();
   const navigate = useNavigate();
   const { getPicklistDetails, recordPick, loading, error } = usePickingApi();
-  
+
   const [items, setItems] = useState([]);
   const [pickedQuantities, setPickedQuantities] = useState({}); // { itemId: quantity }
   const [actionLoading, setActionLoading] = useState({}); // { itemId: boolean }
@@ -24,7 +24,7 @@ export default function ActivePicklist() {
         if (response && response.picklistDetails && response.picklistDetails.items) {
           const fetchedItems = response.picklistDetails.items;
           setItems(fetchedItems);
-          
+
           // Pre-populate picked item states
           const initialPicks = {};
           fetchedItems.forEach(item => {
@@ -92,7 +92,7 @@ export default function ActivePicklist() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', paddingBottom: '80px' }}>
-      
+
       {/* Header Navigation */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
         <button
@@ -161,9 +161,9 @@ export default function ActivePicklist() {
             const itemId = getItemId(item);
             const isPicked = isItemPicked(item);
             const isLoading = actionLoading[itemId];
-            
+
             // Build human-readable location label
-            const locationStr = item.aisle 
+            const locationStr = item.aisle
               ? `Aisle ${item.aisle} • Sec ${item.section || '-'} • Lvl ${item.level || '-'}`
               : item.locationSeqId || 'Default Area';
 
@@ -200,7 +200,7 @@ export default function ActivePicklist() {
                     <MapPin size={12} />
                     {locationStr}
                   </span>
-                  
+
                   <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontFamily: 'monospace' }}>
                     Order: {item.orderId}
                   </span>
@@ -292,7 +292,7 @@ export default function ActivePicklist() {
               <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>Ready to close pick run</span>
             </div>
           </div>
-          
+
           <button
             onClick={() => setShowSuccessModal(true)}
             className="btn"
