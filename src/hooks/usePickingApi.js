@@ -116,6 +116,27 @@ export function usePickingApi() {
     });
   }, [request]);
 
+  const getPickingPicklists = useCallback(async (facilityId, statusId, searchQuery) => {
+    const inParams = JSON.stringify({ facilityId, statusId, searchQuery });
+    return await request(`/rest/services/getPickingPicklists?inParams=${encodeURIComponent(inParams)}`, {
+      method: 'GET',
+    });
+  }, [request]);
+
+  const cancelPickingPicklist = useCallback(async (picklistId) => {
+    return await request('/rest/services/cancelPickingPicklist', {
+      method: 'POST',
+      body: JSON.stringify({ picklistId }),
+    });
+  }, [request]);
+
+  const getPickingPicklistPdf = useCallback(async (picklistId) => {
+    const inParams = JSON.stringify({ picklistId });
+    return await request(`/rest/services/getPickingPicklistPdf?inParams=${encodeURIComponent(inParams)}`, {
+      method: 'GET',
+    });
+  }, [request]);
+
   return {
     loading,
     error,
@@ -125,5 +146,8 @@ export function usePickingApi() {
     createPicklist,
     getPicklistDetails,
     recordPick,
+    getPickingPicklists,
+    cancelPickingPicklist,
+    getPickingPicklistPdf,
   };
 }
