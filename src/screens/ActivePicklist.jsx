@@ -14,7 +14,7 @@ export default function ActivePicklist() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
 
-  const getItemId = (item) => `${item.picklistBinId}-${item.orderId}-${item.orderItemSeqId}`;
+  const getItemId = (item) => `${item.picklistBinId}-${item.orderId}-${item.orderItemSeqId}-${item.shipGroupSeqId}-${item.inventoryItemId}`;
 
   useEffect(() => {
     const fetchPicklist = async () => {
@@ -94,18 +94,31 @@ export default function ActivePicklist() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', paddingBottom: '80px' }}>
 
       {/* Header Navigation */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-        <button
-          onClick={() => navigate('/queue')}
-          className="btn btn-secondary"
-          style={{ width: 'auto', padding: '10px' }}
-        >
-          <ChevronLeft size={16} />
-        </button>
-        <div>
-          <h2 style={{ fontSize: '1.3rem', fontWeight: '700' }}>Active Picklist</h2>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>Run ID: {picklistId}</p>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <button
+            onClick={() => navigate('/queue')}
+            className="btn btn-secondary"
+            style={{ width: 'auto', padding: '10px' }}
+          >
+            <ChevronLeft size={16} />
+          </button>
+          <div>
+            <h2 style={{ fontSize: '1.3rem', fontWeight: '700' }}>Active Picklist</h2>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>Run ID: {picklistId}</p>
+          </div>
         </div>
+
+        {!isRunComplete && totalItemsCount > 0 && (
+          <button
+            onClick={() => navigate(`/picklist/${picklistId}/pick`)}
+            className="btn btn-primary"
+            style={{ width: 'auto', display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 16px' }}
+          >
+            <Play size={16} fill="currentColor" />
+            {pickedItemsCount > 0 ? 'Scan Item' : 'Start Pick'}
+          </button>
+        )}
       </div>
 
       {/* Progress Card */}
