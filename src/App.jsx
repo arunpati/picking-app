@@ -10,6 +10,7 @@ import FacilitySelect from './screens/FacilitySelect';
 import OrderQueue from './screens/OrderQueue';
 import ActivePicklist from './screens/ActivePicklist';
 import PicklistList from './screens/PicklistList';
+import PickingDetail from './screens/PickingDetail';
 
 // Contexts
 export const AuthContext = createContext(null);
@@ -209,6 +210,18 @@ function MainRoutes() {
           </RequireAuth>
         }
       />
+      <Route
+        path="/picklist/:picklistId/pick"
+        element={
+          <RequireAuth>
+            <RequireFacility>
+              <Layout>
+                <PickingDetail />
+              </Layout>
+            </RequireFacility>
+          </RequireAuth>
+        }
+      />
       {/* Root redirect logic */}
       <Route
         path="/"
@@ -242,6 +255,7 @@ export default function App() {
 
   useEffect(() => {
     if (!token) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setUser(null);
       return;
     }
