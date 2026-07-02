@@ -1,7 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
-import { LogOut, Box, Shield, Warehouse, Menu, X, ClipboardList } from 'lucide-react';
+import { LogOut, Box, Shield, Warehouse, Menu, X, ClipboardList, FileText } from 'lucide-react';
 import { jwtDecode } from 'jwt-decode';
 
 // Import Screens (to be implemented next)
@@ -9,6 +9,7 @@ import Login from './screens/Login';
 import FacilitySelect from './screens/FacilitySelect';
 import OrderQueue from './screens/OrderQueue';
 import ActivePicklist from './screens/ActivePicklist';
+import PicklistList from './screens/PicklistList';
 
 // Contexts
 export const AuthContext = createContext(null);
@@ -109,6 +110,15 @@ function Layout({ children }) {
                 </button>
 
                 <button
+                  onClick={() => navigate('/picklists')}
+                  disabled={!facilityId}
+                  className={`sidebar-nav-item ${isActive('/picklists') ? 'active' : ''} ${!facilityId ? 'disabled' : ''}`}
+                >
+                  <FileText size={18} />
+                  Picklists
+                </button>
+
+                <button
                   onClick={() => navigate('/facility')}
                   className={`sidebar-nav-item ${isActive('/facility') ? 'active' : ''}`}
                 >
@@ -170,6 +180,18 @@ function MainRoutes() {
             <RequireFacility>
               <Layout>
                 <OrderQueue />
+              </Layout>
+            </RequireFacility>
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/picklists"
+        element={
+          <RequireAuth>
+            <RequireFacility>
+              <Layout>
+                <PicklistList />
               </Layout>
             </RequireFacility>
           </RequireAuth>
