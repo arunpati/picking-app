@@ -65,7 +65,7 @@ export function usePickingApi() {
     } finally {
       setLoading(false);
     }
-  }, [getHeaders]);
+  }, [getHeaders, logout]);
 
   const login = useCallback(async (username, password) => {
     // The standard rest-api endpoint for JWT is POST /rest/auth/token, which requires Basic Auth.
