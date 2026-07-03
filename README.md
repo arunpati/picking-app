@@ -9,7 +9,9 @@ A dedicated React-based Progressive Web App (PWA) built to streamline warehouse 
 Make sure the following are installed:
 - **Node.js**: v18.x or higher
 - **Package Manager**: `pnpm` (recommended) or `npm`
-- **Apache OFBiz Backend**: A running instance with JAX-RS REST services enabled.
+- **Apache OFBiz Backend**: A running instance of our custom backend fork:
+  - **Repository URL**: `https://github.com/arunpati/arun-ofbiz-framework.git`
+  - **Branch**: `picking-pwa` (required for PWA JAX-RS REST APIs and services)
 
 ---
 
