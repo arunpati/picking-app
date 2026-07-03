@@ -11,6 +11,7 @@ import OrderQueue from './screens/OrderQueue';
 import ActivePicklist from './screens/ActivePicklist';
 import PicklistList from './screens/PicklistList';
 import PickingDetail from './screens/PickingDetail';
+import SuccessSummary from './screens/SuccessSummary';
 
 // Contexts
 export const AuthContext = createContext(null);
@@ -217,6 +218,18 @@ function MainRoutes() {
             <RequireFacility>
               <Layout>
                 <PickingDetail />
+              </Layout>
+            </RequireFacility>
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/picklist/:picklistId/success"
+        element={
+          <RequireAuth>
+            <RequireFacility>
+              <Layout>
+                <SuccessSummary />
               </Layout>
             </RequireFacility>
           </RequireAuth>

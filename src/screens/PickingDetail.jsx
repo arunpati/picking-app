@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronLeft, MapPin, Check, AlertCircle, Scan, Volume2, VolumeX, Keyboard, SkipForward, Award, ArrowRight } from 'lucide-react';
+import { ChevronLeft, MapPin, Check, AlertCircle, Scan, Volume2, VolumeX, Keyboard, SkipForward } from 'lucide-react';
 import { usePickingApi } from '../hooks/usePickingApi';
 import { useHardwareScanner } from '../hooks/useHardwareScanner';
 import { CameraScanner } from '../utils/ScannerManager';
@@ -97,6 +97,13 @@ export default function PickingDetail() {
     setErrorMessage(null);
     setSuccessMessage(null);
   }, [currentItem?.productId]);
+
+  // Redirect to success summary screen when all items are picked
+  useEffect(() => {
+    if (items.length > 0 && completedItemIds.size === items.length) {
+      navigate(`/picklist/${picklistId}/success`, { replace: true });
+    }
+  }, [items.length, completedItemIds.size, picklistId, navigate]);
 
   // Trigger web audio beep on scan
   const playBeep = useCallback((type) => {
@@ -269,73 +276,7 @@ export default function PickingDetail() {
     );
   };
 
-  // Completion view when all items are picked
-  if (items.length > 0 && completedItemIds.size === items.length) {
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', alignItems: 'center', padding: '40px 20px', textAlign: 'center' }}>
-        <div className="glass-panel" style={{
-          maxWidth: '450px',
-          width: '100%',
-          padding: '40px 24px',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: '24px',
-          border: '1px solid rgba(16, 185, 129, 0.3)'
-        }}>
-          <div style={{
-            background: 'var(--success-glow)',
-            border: '1px solid rgba(16, 185, 129, 0.4)',
-            borderRadius: '50%',
-            padding: '20px',
-            color: 'var(--success)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}>
-            <Award size={48} />
-          </div>
 
-          <div>
-            <h2 className="text-gradient" style={{ fontSize: '1.6rem', fontWeight: '700', marginBottom: '8px' }}>Pick Run Completed!</h2>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
-              All items in Picklist <strong>{picklistId}</strong> have been successfully picked and recorded.
-            </p>
-          </div>
-
-          <div style={{
-            width: '100%',
-            background: 'rgba(255, 255, 255, 0.02)',
-            borderRadius: '8px',
-            padding: '16px',
-            fontSize: '0.85rem',
-            border: '1px solid var(--border-color)',
-            display: 'flex',
-            justifyContent: 'space-around'
-          }}>
-            <div>
-              <span style={{ display: 'block', color: 'var(--text-muted)', fontSize: '0.75rem' }}>TOTAL ITEMS</span>
-              <strong style={{ fontSize: '1.2rem', color: 'var(--text-primary)' }}>{totalCount}</strong>
-            </div>
-            <div style={{ borderLeft: '1px solid var(--border-color)' }}></div>
-            <div>
-              <span style={{ display: 'block', color: 'var(--text-muted)', fontSize: '0.75rem' }}>STATUS</span>
-              <strong style={{ fontSize: '1.2rem', color: 'var(--success)' }}>Complete</strong>
-            </div>
-          </div>
-
-          <button
-            onClick={() => navigate(`/picklist/${picklistId}`)}
-            className="btn btn-primary"
-            style={{ width: '100%', padding: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
-          >
-            Go to Summary
-            <ArrowRight size={16} />
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', paddingBottom: '40px' }}>

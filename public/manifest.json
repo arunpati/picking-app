@@ -1,0 +1,39 @@
+{
+  "short_name": "Picking",
+  "name": "OFbiz Picking",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/pwa_icon_512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshot_desktop.jpg",
+      "sizes": "640x640",
+      "type": "image/jpeg",
+      "form_factor": "wide",
+      "label": "OFbiz Picking Desktop Dashboard"
+    },
+    {
+      "src": "/screenshot_mobile.jpg",
+      "sizes": "640x640",
+      "type": "image/jpeg",
+      "form_factor": "narrow",
+      "label": "OFbiz Picking Mobile Scanning"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#0a0a0c",
+  "theme_color": "#f59e0b",
+  "display": "standalone",
+  "orientation": "portrait"
+}
